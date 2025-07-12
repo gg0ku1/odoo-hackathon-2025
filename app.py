@@ -102,12 +102,13 @@ def admin_dashboard():
         ]
     })
 
-# Register admin blueprint
-app.register_blueprint(admin_blueprint, url_prefix='/admin')
-
+# Serve admin page
 @app.route('/admin')
 def admin_page():
     return send_from_directory('.', 'admin.html')
+
+# Register admin blueprint
+app.register_blueprint(admin_blueprint, url_prefix='/admin')
 
 # MAIN
 if __name__ == '__main__':
