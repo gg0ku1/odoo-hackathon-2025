@@ -1,53 +1,13 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request, jsonify, redirect, url_for
 from flask_socketio import SocketIO
-from datetime import datetime
-import uuid
+from admin_routes import admin_blueprint
+from models import db, User, SwapRequest  # Import from models.py
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skill_swap.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db.init_app(app)  # Initialize db with app
 socketio = SocketIO(app, cors_allowed_origins="*")
-
-# MODELS
-class User(db.Model):
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    name = db.Column(db.String(100), nullable=False)
-    location = db.Column(db.String(100))
-    skills_offered = db.Column(db.String(500))  # Changed back to String
-    skills_wanted = db.Column(db.String(500))   # Changed back to String
-    availability = db.Column(db.String(100))
-    is_public = db.Column(db.Boolean, default=True)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "location": self.location,
-            "skills_offered": self.skills_offered,
-            "skills_wanted": self.skills_wanted,
-            "availability": self.availability,
-            "is_public": self.is_public
-        }
-
-class SwapRequest(db.Model):
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    sender_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
-    receiver_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
-    skill_requested = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default="pending")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "sender_id": self.sender_id,
-            "receiver_id": self.receiver_id,
-            "skill_requested": self.skill_requested,
-            "status": self.status,
-            "created_at": self.created_at.isoformat()
-        }
 
 # ROUTES
 @app.route('/api/users', methods=['POST'])
@@ -116,6 +76,33 @@ def delete_swap(swap_id):
     db.session.delete(swap)
     db.session.commit()
     return jsonify({"message": f"Swap {swap_id} deleted"}), 200
+
+# Admin Login Route
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    data = request.get_json()
+    admin_username = data.get('username')
+    admin_password = data.get('password')
+    if admin_username == "admin" and admin_password == "admin123":
+        return redirect(url_for('admin_dashboard'))  # Use function name directly
+    return jsonify({"error": "Invalid credentials"}), 401
+
+# Admin Dashboard Route (placeholder)
+@app.route('/admin/dashboard')
+def admin_dashboard():
+    return jsonify({
+        "message": "Welcome to Admin Dashboard",
+        "actions": [
+            "/admin/ban/<user_id>",
+            "/admin/review/<user_id>",
+            "/admin/swaps?status=<status>",
+            "/admin/broadcast",
+            "/admin/report"
+        ]
+    })
+
+# Register admin blueprint
+app.register_blueprint(admin_blueprint, url_prefix='/admin')
 
 # MAIN
 if __name__ == '__main__':
