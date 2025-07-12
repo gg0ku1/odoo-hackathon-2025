@@ -31,6 +31,11 @@ def create_user():
     db.session.commit()
     return jsonify({"id": new_user.id, "name": new_user.name}), 201
 
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    users = User.query.all()
+    return jsonify([{"id": u.id, "name": u.name} for u in users])
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
