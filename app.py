@@ -19,13 +19,15 @@ class User(db.Model):
 @app.route('/api/users', methods=['POST'])
 def create_user():
     data = request.get_json()
+    if not data or not all(key in data for key in ['name', 'skills_offered', 'skills_wanted', 'availability', 'is_public']):
+        return jsonify({"error": "All fields (name, skills_offered, skills_wanted, availability, is_public) are required"}), 400
     new_user = User(
         name=data['name'],
         location=data.get('location'),
-        skills_offered=data.get('skills_offered', ''),
-        skills_wanted=data.get('skills_wanted', ''),
-        availability=data.get('availability', ''),
-        is_public=data.get('is_public', False)
+        skills_offered=data['skills_offered'],
+        skills_wanted=data['skills_wanted'],
+        availability=data['availability'],
+        is_public=data['is_public']
     )
     db.session.add(new_user)
     db.session.commit()
