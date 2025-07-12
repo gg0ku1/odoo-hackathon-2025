@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SkillSwap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        :root {
+            --primary: #304FFE;
+            --primary-light: #5C7CFF;
+            --accent: #C8AB37;
+            --accent-light: #D4BC4A;
+            --emerald: #147460;
+            --emerald-light: #1A8B73;
+            --text-primary: #1A1A1A;
+            --text-secondary: #4A4A4A;
+            --text-muted: #6B7280;
+            --bg-primary: #FAFAF9;
+            --bg-secondary: #F2F4F6;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-ambient: 0 0 40px rgba(48, 79, 254, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+
+        .serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(48, 79, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 22px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(48, 79, 254, 0.1);
+            background: white;
+        }
+
+        .form-input:disabled {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .photo-upload {
+            position: relative;
+            display: inline-block;
+        }
+
+        .photo-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .photo-upload:hover .photo-upload-overlay {
+            opacity: 1;
+        }
+
+        .skill-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .skill-tag.teach {
+            background: linear-gradient(135deg, var(--emerald) 0%, var(--emerald-light) 100%);
+        }
+
+        .skill-tag.learn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        .skill-tag.removable {
+            cursor: pointer;
+        }
+
+        .skill-tag.removable:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .skill-input-container {
+            position: relative;
+        }
+
+        .skill-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .skill-suggestion {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .skill-suggestion:hover {
+            background: var(--bg-secondary);
+        }
+
+        .section-header {
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .changes-indicator {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .changes-indicator.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .profile-photo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .btn-primary, .btn-secondary, .btn-danger {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen py-8 px-4">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8 fade-in">
+                <div>
+                    <h1 class="text-4xl font-bold serif mb-2">My Profile</h1>
+                    <p class="text-lg text-gray-600">Manage your skills and preferences</p>
+                </div>
+                <div class="flex gap-4">
+                    <button class="btn-secondary" onclick="window.location.href='{{ url_for('dashboard') }}'">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Stats -->
+            <div class="card p-6 mb-6 fade-in">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">{{ user.swap_count or 0 }}</span>
+                        <span class="stat-label">Swaps Completed</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">{{ user.rating or 0 }}</span>
+                        <span class="stat-label">Average Rating</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">{{ user.skills_teach|length if user.skills_teach else 0 }}</span>
+                        <span class="stat-label">Skills Teaching</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">{{ user.skills_learn|length if user.skills_learn else 0 }}</span>
+                        <span class="stat-label">Skills Learning</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Profile Form -->
+            <form id="profileForm" method="POST" enctype="multipart/form-data" action="{{ url_for('profile') }}">
+                <!-- Basic Information -->
+                <div class="card p-8 mb-6 fade-in">
+                    <div class="section-header">
+                        <h2 class="text-2xl font-semibold serif">Basic Information</h2>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-8 mb-6">
+                        <!-- Profile Photo -->
+                        <div class="flex flex-col items-center">
+                            <div class="photo-upload">
+                                <img src="{{ user.profile_photo or '/static/default-avatar.png' }}" 
+                                     alt="Profile Photo" class="profile-photo" id="profilePhotoPreview">
+                                <div class="photo-upload-overlay">
+                                    <i data-lucide="camera" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <input type="file" id="profilePhoto" name="profile_photo" 
+                                       accept="image/*" class="hidden" onchange="previewPhoto(this)">
+                            </div>
+                            <button type="button" class="btn-secondary mt-4" onclick="document.getElementById('profilePhoto').click()">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                Change Photo
+                            </button>
+                        </div>
+
+                        <!-- Basic Details -->
+                        <div class="flex-1">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2" for="firstName">First Name</label>
+                                    <input type="text" id="firstName" name="first_name" class="form-input" 
+                                           value="{{ user.first_name or '' }}" onchange="markChanged()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2" for="lastName">Last Name</label>
+                                    <input type="text" id="lastName" name="last_name" class="form-input" 
+                                           value="{{ user.last_name or '' }}" onchange="markChanged()">
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2" for="email">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" 
+                                       value="{{ user.email or '' }}" disabled>
+                                <p class="text-sm text-gray-500 mt-1">Email cannot be changed</p>
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2" for="location">Location</label>
+                                <input type="text" id="location" name="location" class="form-input" 
+                                       value="{{ user.location or '' }}" placeholder="City, Country" onchange="markChanged()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" for="bio">Bio</label>
+                        <textarea id="bio" name="bio" class="form-input" rows="4" 
+                                  placeholder="Tell others about yourself..." onchange="markChanged()">{{ user.bio or '' }}</textarea>
+                    </div>
+
+                    <!-- Availability -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" for="availability">Availability</label>
+                        <select id="availability" name="availability" class="form-input" onchange="markChanged()">
+                            <option value="">Select your availability</option>
+                            <option value="weekdays" {{ 'selected' if user.availability == 'weekdays' else '' }}>Weekdays</option>
+                            <option value="weekends" {{ 'selected' if user.availability == 'weekends' else '' }}>Weekends</option>
+                            <option value="evenings" {{ 'selected' if user.availability == 'evenings' else '' }}>Evenings</option>
+                            <option value="flexible" {{ 'selected' if user.availability == 'flexible' else '' }}>Flexible</option>
+                        </select>
+                    </div>
+
+                    <!-- Profile Visibility -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h3 class="font-medium">Profile Visibility</h3>
+                            <p class="text-sm text-gray-600">Make your profile visible to other users</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="isPublic" name="is_public" 
+                                   {{ 'checked' if user.is_public else '' }} onchange="markChanged()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Skills I Can Teach -->
+                <div class="card p-8 mb-6 fade-in">
+                    <div class="section-header">
+                        <h2 class="text-2xl font-semibold serif">Skills I Can Teach</h2>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Add Skills</label>
+                        <div class="skill-input-container">
+                            <input type="text" id="teachSkillInput" class="form-input" 
+                                   placeholder="Type a skill to add...">
+                            <div class="skill-suggestions" id="teachSkillSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex flex-wrap" id="teachSkillTags">
+                            {% if user.skills_teach %}
+                                {% for skill in user.skills_teach %}
+                                <span class="skill-tag teach removable" onclick="removeSkill('{{ skill }}', 'teach')">
+                                    {{ skill }}
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" for="teachingExperience">Teaching Experience</label>
+                        <textarea id="teachingExperience" name="teaching_experience" class="form-input" rows="4" 
+                                  placeholder="Describe your teaching experience..." onchange="markChanged()">{{ user.teaching_experience or '' }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Skills I Want to Learn -->
+                <div class="card p-8 mb-6 fade-in">
+                    <div class="section-header">
+                        <h2 class="text-2xl font-semibold serif">Skills I Want to Learn</h2>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Add Skills</label>
+                        <div class="skill-input-container">
+                            <input type="text" id="learnSkillInput" class="form-input" 
+                                   placeholder="Type a skill to add...">
+                            <div class="skill-suggestions" id="learnSkillSuggestions"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex flex-wrap" id="learnSkillTags">
+                            {% if user.skills_learn %}
+                                {% for skill in user.skills_learn %}
+                                <span class="skill-tag learn removable" onclick="removeSkill('{{ skill }}', 'learn')">
+                                    {{ skill }}
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card p-6 fade-in">
+                    <div class="flex flex-col md:flex-row gap-4 justify-between">
+                        <button type="button" class="btn-danger" onclick="resetForm()">
+                            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                            Discard Changes
+                        </button>
+                        <div class="flex gap-4">
+                            <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('dashboard') }}'">
+                                <i data-lucide="x" class="w-5 h-5"></i>
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn-primary">
+                                <i data-lucide="save" class="w-5 h-5"></i>
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden inputs for skills -->
+                <input type="hidden" name="skills_teach" id="skillsTeachInput">
+                <input type="hidden" name="skills_learn" id="skillsLearnInput">
+            </form>
+        </div>
+    </div>
+
+    <!-- Changes Indicator -->
+    <div class="changes-indicator" id="changesIndicator">
+        <i data-lucide="alert-circle" class="w-5 h-5 inline mr-2"></i>
+        You have unsaved changes
+    </div>
+
+    <script>
+        let hasChanges = false;
+        let teachSkills = {{ user.skills_teach|tojson if user.skills_teach else '[]'|safe }};
+        let learnSkills = {{ user.skills_learn|tojson if user.skills_learn else '[]'|safe }};
+
+        // Popular skills for suggestions
+        const popularSkills = [
+            'Python', 'JavaScript', 'React', 'Node.js', 'HTML/CSS', 'Java', 'C++', 'SQL',
+            'Guitar', 'Piano', 'Violin', 'Drums', 'Singing', 'Music Theory',
+            'Photography', 'Photoshop', 'Illustrator', 'Video Editing', 'Graphic Design',
+            'Spanish', 'French', 'German', 'Italian', 'Japanese', 'Chinese', 'English',
+            'Cooking', 'Baking', 'Yoga', 'Meditation', 'Drawing', 'Painting', 'Writing',
+            'Marketing', 'Sales', 'Public Speaking', 'Leadership', 'Project Management',
+            'Data Science', 'Machine Learning', 'Excel', 'Statistics', 'Finance'
+        ];
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mark form as changed
+        function markChanged() {
+            hasChanges = true;
+            document.getElementById('changesIndicator').classList.add('show');
+        }
+
+        // Photo preview
+        function previewPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePhotoPreview').src = e.target.result;
+                    markChanged();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Skill management
+        function setupSkillInput(inputId, suggestionsId, skillsArray, type) {
+            const input = document.getElementById(inputId);
+            const suggestions = document.getElementById(suggestionsId);
+
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                if (value.length > 0) {
+                    const matches = popularSkills.filter(skill => 
+                        skill.toLowerCase().includes(value) && 
+                        !skillsArray.includes(skill)
+                    );
+                    
+                    if (matches.length > 0) {
+                        suggestions.innerHTML = matches.map(skill => 
+                            `<div class="skill-suggestion" onclick="addSkill('${skill}', '${type}')">${skill}</div>`
+                        ).join('');
+                        suggestions.style.display = 'block';
+                    } else {
+                        suggestions.style.display = 'none';
+                    }
+                } else {
+                    suggestions.style.display = 'none';
+                }
+            });
+
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const skill = this.value.trim();
+                    if (skill && !skillsArray.includes(skill)) {
+                        addSkill(skill, type);
+                    }
+                }
+            });
+        }
+
+        function addSkill(skill, type) {
+            const skillsArray = type === 'teach' ? teachSkills : learnSkills;
+            if (!skillsArray.includes(skill)) {
+                skillsArray.push(skill);
+                renderSkillTags(type);
+                document.getElementById(type + 'SkillInput').value = '';
+                document.getElementById(type + 'SkillSuggestions').style.display = 'none';
+                markChanged();
+            }
+        }
+
+        function removeSkill(skill, type) {
+            const skillsArray = type === 'teach' ? teachSkills : learnSkills;
+            const index = skillsArray.indexOf(skill);
+            if (index > -1) {
+                skillsArray.splice(index, 1);
+                renderSkillTags(type);
+                markChanged();
+            }
+        }
+
+        function renderSkillTags(type) {
+            const skillsArray = type === 'teach' ? teachSkills : learnSkills;
+            const container = document.getElementById(type + 'SkillTags');
+            container.innerHTML = skillsArray.map(skill => 
+                `<span class="skill-tag ${type} removable" onclick="removeSkill('${skill}', '${type}')">
+                    ${skill}
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </span>`
+            ).join('');
+            lucide.createIcons();
+        }
+
+        // Initialize skill inputs
+        setupSkillInput('teachSkillInput', 'teachSkillSuggestions', teachSkills, 'teach');
+        setupSkillInput('learnSkillInput', 'learnSkillSuggestions', learnSkills, 'learn');
+
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to discard all changes?')) {
+                location.reload();
+            }
+        }
+
+        // Form submission
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            document.getElementById('skillsTeachInput').value = JSON.stringify(teachSkills);
+            document.getElementById('skillsLearnInput').value = JSON.stringify(learnSkills);
+            hasChanges = false;
+        });
+
+        // Warn before leaving with unsaved changes
+        window.addEventListener('beforeunload', function(e) {
+            if (hasChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.skill-input-container')) {
+                document.querySelectorAll('.skill-suggestions').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
