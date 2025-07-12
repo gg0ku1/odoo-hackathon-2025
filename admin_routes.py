@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app import db, User, SwapRequest
+from models import db, User, SwapRequest  # Import from models.py
 
 admin_blueprint = Blueprint('admin', __name__)
 
@@ -27,14 +27,14 @@ def clear_user_skills(user_id):
 # Monitor swaps 
 @admin_blueprint.route('/swaps', methods=['GET'])
 def monitor_swaps():
-    status = request.args.get('status')  # Example: /api/admin/swaps?status=pending
+    status = request.args.get('status')
     query = SwapRequest.query
     if status:
         query = query.filter_by(status=status)
     swaps = query.all()
     return jsonify([s.to_dict() for s in swaps]), 200
 
-#Send platform-wide message 
+# Send platform-wide message 
 @admin_blueprint.route('/broadcast', methods=['POST'])
 def broadcast_message():
     data = request.get_json()
