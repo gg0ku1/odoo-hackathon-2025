@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, redirect, url_for
 from flask_socketio import SocketIO
 from admin_routes import admin_blueprint
 from models import db, User, SwapRequest  # Import from models.py
+from flask import send_from_directory
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skill_swap.db'
@@ -103,6 +104,10 @@ def admin_dashboard():
 
 # Register admin blueprint
 app.register_blueprint(admin_blueprint, url_prefix='/admin')
+
+@app.route('/admin')
+def admin_page():
+    return send_from_directory('.', 'admin.html')
 
 # MAIN
 if __name__ == '__main__':
