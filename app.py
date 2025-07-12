@@ -11,13 +11,12 @@ db = SQLAlchemy(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # MODELS
-
 class User(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(100), nullable=False)
     location = db.Column(db.String(100))
-    skills_offered = db.Column(db.PickleType)  # Store lists directly
-    skills_wanted = db.Column(db.PickleType)
+    skills_offered = db.Column(db.String(500))  # Changed back to String
+    skills_wanted = db.Column(db.String(500))   # Changed back to String
     availability = db.Column(db.String(100))
     is_public = db.Column(db.Boolean, default=True)
 
@@ -32,13 +31,12 @@ class User(db.Model):
             "is_public": self.is_public
         }
 
-
-class SwapRequest(db.Model):  # renamed from Swap
+class SwapRequest(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     sender_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
     receiver_id = db.Column(db.String(36), db.ForeignKey('user.id'), nullable=False)
     skill_requested = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.String(20), default="pending")  # pending, accepted, rejected
+    status = db.Column(db.String(20), default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -52,8 +50,6 @@ class SwapRequest(db.Model):  # renamed from Swap
         }
 
 # ROUTES
-
-# USER ROUTES
 @app.route('/api/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -71,13 +67,11 @@ def create_user():
     db.session.commit()
     return jsonify(new_user.to_dict()), 201
 
-
 @app.route('/api/users', methods=['GET'])
 def get_users():
     users = User.query.all()
     return jsonify([u.to_dict() for u in users])
 
-# SWAP ROUTES
 @app.route('/api/swaps', methods=['POST'])
 def create_swap():
     data = request.get_json()
@@ -90,27 +84,20 @@ def create_swap():
     )
     db.session.add(new_swap)
     db.session.commit()
-
-    # Real-time update
     socketio.emit('new_swap', new_swap.to_dict())
-
     return jsonify(new_swap.to_dict()), 201
-
 
 @app.route('/api/swaps', methods=['GET'])
 def list_swaps():
     sender_id = request.args.get('sender_id')
     receiver_id = request.args.get('receiver_id')
     query = SwapRequest.query
-
     if sender_id:
         query = query.filter_by(sender_id=sender_id)
     if receiver_id:
         query = query.filter_by(receiver_id=receiver_id)
-
     swaps = query.all()
     return jsonify([s.to_dict() for s in swaps])
-
 
 @app.route('/api/swaps/<string:swap_id>', methods=['PUT'])
 def update_swap(swap_id):
@@ -120,12 +107,8 @@ def update_swap(swap_id):
         return jsonify({"error": "Invalid status"}), 400
     swap.status = new_status
     db.session.commit()
-
-    # Real-time update
     socketio.emit('swap_update', swap.to_dict())
-
     return jsonify(swap.to_dict()), 200
-
 
 @app.route('/api/swaps/<string:swap_id>', methods=['DELETE'])
 def delete_swap(swap_id):
