@@ -351,452 +351,155 @@
     }
 </style>
 
-<div class="container mx-auto px-4 py-8">
-    <!-- Hero Section -->
-    <div class="hero-section p-16 text-center relative">
-        <div class="relative z-10">
-            <h1 class="text-5xl font-bold serif mb-4">Learn & Share Skills</h1>
-            <p class="text-xl text-muted mb-8 max-w-2xl mx-auto">
-                Connect with people who want to learn what you know, and teach what you want to learn. 
-                Join thousands of skill swappers worldwide.
-            </p>
-            
-            <!-- Search Bar -->
-            <div class="search-container mb-8">
-                <input type="text" id="searchInput" class="search-input" 
-                       placeholder="Search skills, people, or locations...">
-                <button class="search-btn" onclick="performSearch()">
-                    <i data-lucide="search" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="{{ url_for('signup') }}" class="btn btn-primary px-8 py-4 text-lg">
-                    <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
-                    Join SkillSwap
-                </a>
-                <a href="{{ url_for('login') }}" class="btn btn-secondary px-8 py-4 text-lg">
-                    <i data-lucide="log-in" class="w-5 h-5 mr-2"></i>
-                    Sign In
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="stats-section">
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.total_users or 1247 }}</div>
-            <div class="stat-label">Active Members</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.total_skills or 356 }}</div>
-            <div class="stat-label">Skills Available</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.successful_swaps or 892 }}</div>
-            <div class="stat-label">Successful Swaps</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-number">{{ stats.countries or 43 }}</div>
-            <div class="stat-label">Countries</div>
-        </div>
-    </div>
-
-    <!-- Filters Section -->
-    <div class="filter-section">
-        <h3 class="text-lg font-semibold mb-4">Popular Skills</h3>
-        <div class="filter-tags">
-            <div class="filter-tag active" data-filter="all">All Skills</div>
-            <div class="filter-tag" data-filter="programming">Programming</div>
-            <div class="filter-tag" data-filter="languages">Languages</div>
-            <div class="filter-tag" data-filter="music">Music</div>
-            <div class="filter-tag" data-filter="design">Design</div>
-            <div class="filter-tag" data-filter="cooking">Cooking</div>
-            <div class="filter-tag" data-filter="fitness">Fitness</div>
-            <div class="filter-tag" data-filter="business">Business</div>
-        </div>
+<!-- Hero Section -->
+<div class="hero-section p-8 md:p-12">
+    <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Find Your Next Learning Exchange</h1>
+        <p class="text-lg md:text-xl mb-8 text-gray-600">Connect with people who want to learn what you know and teach what you want to learn.</p>
         
-        <div class="flex flex-wrap gap-4 items-center">
-            <select id="availabilityFilter" class="form-input w-auto min-w-48">
-                <option value="">All Availability</option>
-                <option value="weekdays">Weekdays</option>
-                <option value="weekends">Weekends</option>
-                <option value="evenings">Evenings</option>
-                <option value="flexible">Flexible</option>
-            </select>
-            
-            <select id="locationFilter" class="form-input w-auto min-w-48">
-                <option value="">All Locations</option>
-                <option value="remote">Remote Only</option>
-                <option value="in-person">In-Person Available</option>
-            </select>
-            
-            <button class="btn btn-secondary" onclick="clearFilters()">
-                <i data-lucide="x" class="w-4 h-4 mr-2"></i>
-                Clear Filters
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search skills, users, or locations...">
+            <button class="search-btn">
+                <i data-lucide="search" class="w-5 h-5"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- Profile Grid -->
-    <div class="profile-grid" id="profileGrid">
-        <!-- Sample profiles - these would be populated from backend -->
-        {% for user in users %}
-        <div class="profile-card" data-skills="{{ user.skills_teach | join(',') | lower }}" 
-             data-availability="{{ user.availability | lower }}" 
-             data-location="{{ 'remote' if not user.location else 'in-person' }}">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    {{ user.first_name[0] }}{{ user.last_name[0] }}
-                </div>
-                <div class="profile-info">
-                    <h3>{{ user.first_name }} {{ user.last_name }}</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        {{ user.location or 'Remote' }}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    {% for skill in user.skills_teach[:3] %}
-                    <span class="skill-chip teach">{{ skill }}</span>
-                    {% endfor %}
-                    {% if user.skills_teach|length > 3 %}
-                    <span class="skill-chip">+{{ user.skills_teach|length - 3 }} more</span>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    {% for skill in user.skills_learn[:3] %}
-                    <span class="skill-chip learn">{{ skill }}</span>
-                    {% endfor %}
-                    {% if user.skills_learn|length > 3 %}
-                    <span class="skill-chip">+{{ user.skills_learn|length - 3 }} more</span>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">{{ user.availability | title }}</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    {{ user.rating or 4.8 }}
-                </div>
-            </div>
-        </div>
-        {% else %}
-        <!-- Sample data for demonstration -->
-        <div class="profile-card" data-skills="python,javascript,react" data-availability="flexible" data-location="remote">
-            <div class="profile-header">
-                <div class="profile-avatar">AS</div>
-                <div class="profile-info">
-                    <h3>Alex Smith</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        San Francisco, CA
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Python</span>
-                    <span class="skill-chip teach">JavaScript</span>
-                    <span class="skill-chip teach">React</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Guitar</span>
-                    <span class="skill-chip learn">Spanish</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Flexible</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.9
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-card" data-skills="guitar,music theory,piano" data-availability="evenings" data-location="in-person">
-            <div class="profile-header">
-                <div class="profile-avatar">MJ</div>
-                <div class="profile-info">
-                    <h3>Maria Johnson</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        New York, NY
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Guitar</span>
-                    <span class="skill-chip teach">Music Theory</span>
-                    <span class="skill-chip teach">Piano</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Photography</span>
-                    <span class="skill-chip learn">Video Editing</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Evenings</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.8
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-card" data-skills="photography,photoshop,lightroom" data-availability="weekends" data-location="remote">
-            <div class="profile-header">
-                <div class="profile-avatar">DL</div>
-                <div class="profile-info">
-                    <h3>David Lee</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        Remote
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Photography</span>
-                    <span class="skill-chip teach">Photoshop</span>
-                    <span class="skill-chip teach">Lightroom</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Web Development</span>
-                    <span class="skill-chip learn">Marketing</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Weekends</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.7
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-card" data-skills="spanish,french,italian" data-availability="weekdays" data-location="remote">
-            <div class="profile-header">
-                <div class="profile-avatar">SC</div>
-                <div class="profile-info">
-                    <h3>Sofia Chen</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        London, UK
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Spanish</span>
-                    <span class="skill-chip teach">French</span>
-                    <span class="skill-chip teach">Italian</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Data Science</span>
-                    <span class="skill-chip learn">Machine Learning</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Weekdays</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.9
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-card" data-skills="cooking,baking,nutrition" data-availability="flexible" data-location="in-person">
-            <div class="profile-header">
-                <div class="profile-avatar">RK</div>
-                <div class="profile-info">
-                    <h3>Raj Kumar</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        Mumbai, India
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Cooking</span>
-                    <span class="skill-chip teach">Baking</span>
-                    <span class="skill-chip teach">Nutrition</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Digital Marketing</span>
-                    <span class="skill-chip learn">Business Strategy</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Flexible</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.8
-                </div>
-            </div>
-        </div>
-
-        <div class="profile-card" data-skills="yoga,meditation,fitness" data-availability="evenings" data-location="in-person">
-            <div class="profile-header">
-                <div class="profile-avatar">LM</div>
-                <div class="profile-info">
-                    <h3>Lisa Miller</h3>
-                    <div class="profile-location">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        Los Angeles, CA
-                    </div>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Can Teach:</span>
-                <div>
-                    <span class="skill-chip teach">Yoga</span>
-                    <span class="skill-chip teach">Meditation</span>
-                    <span class="skill-chip teach">Fitness</span>
-                </div>
-            </div>
-            
-            <div class="skills-section">
-                <span class="skills-label">Wants to Learn:</span>
-                <div>
-                    <span class="skill-chip learn">Graphic Design</span>
-                    <span class="skill-chip learn">Content Creation</span>
-                </div>
-            </div>
-            
-            <div class="profile-meta">
-                <div class="availability-badge">Evenings</div>
-                <div class="rating">
-                    <i data-lucide="star" class="w-4 h-4"></i>
-                    4.9
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination">
-        <button class="pagination-btn" disabled>
-            <i data-lucide="chevron-left" class="w-4 h-4"></i>
-        </button>
-        <button class="pagination-btn active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">...</button>
-        <button class="pagination-btn">12</button>
-        <button class="pagination-btn">
-            <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </button>
-    </div>
-
-    <!-- CTA Section -->
-    <div class="cta-section">
-        <div class="relative z-10">
-            <h2 class="text-3xl font-bold serif mb-4">Ready to Start Learning?</h2>
-            <p class="text-lg mb-6 opacity-90">
-                Join our community of skilled individuals and start your learning journey today.
-            </p>
-            <a href="{{ url_for('signup') }}" class="btn btn-white bg-white text-primary hover:bg-gray-100 px-8 py-4 text-lg font-semibold">
-                <i data-lucide="rocket" class="w-5 h-5 mr-2"></i>
-                Get Started Now
-            </a>
         </div>
     </div>
 </div>
 
+<!-- Filter Section -->
+<div class="filter-section">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Filter Users</h2>
+        <button onclick="clearFilters()" class="text-primary hover:text-primary-light transition-colors">
+            Clear Filters
+        </button>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Skill Filter -->
+        <div>
+            <label class="block text-sm font-medium mb-2">Skills</label>
+            <div class="filter-tags">
+                <span class="filter-tag active" data-filter="all">All Skills</span>
+                {% for skill in skills %}
+                <span class="filter-tag" data-filter="{{ skill }}">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Availability Filter -->
+        <div>
+            <label for="availabilityFilter" class="block text-sm font-medium mb-2">Availability</label>
+            <select id="availabilityFilter" class="w-full p-2 border rounded-lg">
+                <option value="">Any Availability</option>
+                <option value="weekdays">Weekdays</option>
+                <option value="weekends">Weekends</option>
+                <option value="flexible">Flexible</option>
+            </select>
+        </div>
+        
+        <!-- Location Filter -->
+        <div>
+            <label for="locationFilter" class="block text-sm font-medium mb-2">Location</label>
+            <select id="locationFilter" class="w-full p-2 border rounded-lg">
+                <option value="">Any Location</option>
+                {% for location in locations %}
+                <option value="{{ location }}">{{ location }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- User Grid -->
+<div class="profile-grid">
+    {% for user in users %}
+    <div class="profile-card" data-location="{{ user.location }}" data-availability="{{ user.availability }}">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {{ user.name[0] | upper }}
+            </div>
+            <div class="profile-info">
+                <h3>{{ user.name }}</h3>
+                {% if user.location %}
+                <div class="profile-location">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                    <span>{{ user.location }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="skills-section">
+            <span class="skills-label">Skills to Share:</span>
+            <div class="skills-tags">
+                {% for skill in user.skills_offered.split(',') %}
+                <span class="skill-tag">{{ skill.strip() }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="skills-section">
+            <span class="skills-label">Skills to Learn:</span>
+            <div class="skills-tags">
+                {% for skill in user.skills_wanted.split(',') %}
+                <span class="skill-tag wanted">{{ skill.strip() }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="profile-footer">
+            <div class="availability">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                <span>{{ user.availability }}</span>
+            </div>
+            <button class="connect-btn" onclick="location.href='/swap/{{ user.id }}'">
+                Connect & Swap
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
 <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // Filter by skills
+    document.querySelectorAll('.filter-tag').forEach(tag => {
+        tag.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const cards = document.querySelectorAll('.profile-card');
+            cards.forEach(card => {
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else {
+                    const hasSkill = card.querySelector(`.skills-tags:contains('${filter}')`);
+                    card.style.display = hasSkill ? 'block' : 'none';
+                }
+            });
+        });
+    });
+    
     // Search functionality
-    function performSearch() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
         const cards = document.querySelectorAll('.profile-card');
         
         cards.forEach(card => {
-            const skills = card.dataset.skills;
-            const name = card.querySelector('h3').textContent.toLowerCase();
-            const location = card.querySelector('.profile-location').textContent.toLowerCase();
-            
-            if (skills.includes(searchTerm) || name.includes(searchTerm) || location.includes(searchTerm)) {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
             }
         });
-    }
-
-    // Filter functionality
-    document.querySelectorAll('.filter-tag').forEach(tag => {
-        tag.addEventListener('click', function() {
-            // Remove active class from all tags
-            document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
-            // Add active class to clicked tag
-            this.classList.add('active');
-            
-            const filter = this.dataset.filter;
-            const cards = document.querySelectorAll('.profile-card');
-            
-            cards.forEach(card => {
-                if (filter === 'all') {
-                    card.style.display = 'block';
-                } else {
-                    const skills = card.dataset.skills;
-                    if (skills.includes(filter)) {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
-        });
     });
-
+    
     // Availability filter
     document.getElementById('availabilityFilter').addEventListener('change', function() {
         const availability = this.value;
@@ -810,7 +513,7 @@
             }
         });
     });
-
+    
     // Location filter
     document.getElementById('locationFilter').addEventListener('change', function() {
         const location = this.value;
@@ -824,7 +527,7 @@
             }
         });
     });
-
+    
     // Clear filters
     function clearFilters() {
         document.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
@@ -833,4 +536,9 @@
         document.getElementById('locationFilter').value = '';
         document.getElementById('searchInput').value = '';
         
-        document.querySelectorAll('.profile-card').forEach(
+        document.querySelectorAll('.profile-card').forEach(card => {
+            card.style.display = 'block';
+        });
+    }
+</script>
+{% endblock %}

@@ -329,7 +329,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="{{ url_for('index') }}" class="flex items-center gap-2">
+                    <a href="{{ url_for('home') }}" class="flex items-center gap-2">
                         <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                             <i data-lucide="shuffle" class="w-5 h-5 text-white"></i>
                         </div>
@@ -339,16 +339,11 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center space-x-6">
-                    <a href="{{ url_for('index') }}" class="btn btn-ghost">Browse Skills</a>
+                    <a href="{{ url_for('home') }}" class="btn btn-ghost">Browse Skills</a>
                     
-                    {% if current_user.is_authenticated %}
+                    {% if session.get('user_id') %}
                         <a href="{{ url_for('profile') }}" class="btn btn-ghost">My Profile</a>
                         <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">Dashboard</a>
-                        <div class="flex items-center gap-3">
-                            <img src="{{ current_user.profile_photo or '/static/default-avatar.png' }}" 
-                                 alt="Profile" class="w-8 h-8 rounded-full">
-                            <span class="text-sm font-medium">{{ current_user.name }}</span>
-                        </div>
                         <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
                     {% else %}
                         <a href="{{ url_for('login') }}" class="btn btn-ghost">Login</a>
@@ -368,9 +363,9 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="md:hidden hidden bg-white border-t">
             <div class="px-4 py-2 space-y-2">
-                <a href="{{ url_for('index') }}" class="block py-2 text-gray-700">Browse Skills</a>
+                <a href="{{ url_for('home') }}" class="block py-2 text-gray-700">Browse Skills</a>
                 
-                {% if current_user.is_authenticated %}
+                {% if session.get('user_id') %}
                     <a href="{{ url_for('profile') }}" class="block py-2 text-gray-700">My Profile</a>
                     <a href="{{ url_for('dashboard') }}" class="block py-2 text-gray-700">Dashboard</a>
                     <a href="{{ url_for('logout') }}" class="block py-2 text-gray-700">Logout</a>

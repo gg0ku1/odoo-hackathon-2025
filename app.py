@@ -1,14 +1,51 @@
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect, url_for, render_template, session
 from flask_socketio import SocketIO
+from flask_cors import CORS
 from admin_routes import admin_blueprint
-from models import db, User, SwapRequest  # Import from models.py
+from models import db, User, SwapRequest
 from flask import send_from_directory
+import os
+from functools import wraps
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='frontend')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///skill_swap.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)  # Initialize db with app
+app.config['SECRET_KEY'] = os.urandom(24)  # Add a secret key for sessions
+CORS(app)  # Enable CORS for all routes
+db.init_app(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Admin authentication decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_logged_in'):
+            return jsonify({"error": "Admin access required"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.route('/')
+def home():
+    users = User.query.all()
+    
+    # Extract unique skills from users' skills
+    all_skills = set()
+    for user in users:
+        if user.skills_offered:
+            all_skills.update(skill.strip() for skill in user.skills_offered.split(','))
+        if user.skills_wanted:
+            all_skills.update(skill.strip() for skill in user.skills_wanted.split(','))
+    
+    # Extract unique locations
+    locations = set(user.location for user in users if user.location)
+    
+    return render_template(
+        'homepage.html',
+        users=[u.to_dict() for u in users],
+        skills=sorted(all_skills),
+        locations=sorted(locations),
+        stats={}
+    )
 
 # ROUTES
 @app.route('/api/users', methods=['POST'])
@@ -85,11 +122,13 @@ def admin_login():
     admin_username = data.get('username')
     admin_password = data.get('password')
     if admin_username == "admin" and admin_password == "admin123":
+        session['admin_logged_in'] = True  # Set session variable
         return redirect(url_for('admin_dashboard'))  # Use function name directly
     return jsonify({"error": "Invalid credentials"}), 401
 
 # Admin Dashboard Route (placeholder)
 @app.route('/admin/dashboard')
+@admin_required
 def admin_dashboard():
     return jsonify({
         "message": "Welcome to Admin Dashboard",
@@ -106,6 +145,45 @@ def admin_dashboard():
 @app.route('/admin')
 def admin_page():
     return send_from_directory('.', 'admin.html')
+
+# User authentication routes
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        # Add your login logic here
+        session['user_id'] = 1  # Set this to actual user id after authentication
+        return jsonify({"message": "Login successful"})
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        data = request.get_json()
+        # Add your signup logic here
+        return jsonify({"message": "Signup successful"})
+    return render_template('signup.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('home'))
+
+@app.route('/profile')
+def profile():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    # Add your profile page logic here
+    return render_template('userprofile.html')
+
+@app.route('/dashboard')
+def dashboard():
+    if not session.get('user_id'):
+        return redirect(url_for('login'))
+    # Add your dashboard logic here
+    return jsonify({"message": "Dashboard"})
 
 # Register admin blueprint
 app.register_blueprint(admin_blueprint, url_prefix='/admin')
